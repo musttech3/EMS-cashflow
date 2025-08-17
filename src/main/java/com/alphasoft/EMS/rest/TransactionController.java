@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/transactions")
+@RequestMapping("/api")
 public class TransactionController {
 
     TransactionService transactionService;

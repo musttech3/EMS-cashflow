@@ -16,14 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class DemoController {
 
-    AuthenticationService authenticationService;
     @GetMapping
     public ResponseEntity<String> sayHello(
             HttpServletRequest httpRequest,
             @CookieValue(value = "CashFlow-EMS-JWT") String jwt
     ) {
-        UserResponse userResponse = authenticationService.fetchAPI(jwt, httpRequest.getHeader("User-Agent"));
-        return ResponseEntity.ok("Hello " + userResponse.getUsername());
+        return ResponseEntity.ok("Hello world, Success");
     }
 
 }
