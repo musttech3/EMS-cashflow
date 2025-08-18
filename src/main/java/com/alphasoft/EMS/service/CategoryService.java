@@ -41,7 +41,18 @@ public class CategoryService {
     }
 
     public Category findCategoryByUserIdAndCategoryName(Long userId, String categoryName){
-        return categoryRepository.findCategoryByUserIdAndCategoryName(userId, categoryName).orElse(null);
+        List<Category> publicCategories = categoryRepository.findAllByUserId(userId).orElse(null);
+
+        if (publicCategories == null){
+            return null;
+        }
+
+        for (Category category : publicCategories){
+            if (category.getCategoryName().equals(categoryName)){
+                return category;
+            }
+        }
+        return null;
     }
 
 }

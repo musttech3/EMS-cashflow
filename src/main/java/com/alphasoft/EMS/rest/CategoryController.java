@@ -62,12 +62,26 @@ public class CategoryController {
     ) {
         UserResponse userResponse = authenticationService.fetchAPI(jwt, httpRequest.getHeader("User-Agent"));
         User user = userService.findUserById(userResponse.getId());
-        Category category = Category.builder()
-                .categoryName(categoryRequest.getCategoryName())
-                .type(CategoryType.valueOf(categoryRequest.getType()))
-                .user(user)
-                .build();
-        categoryService.save(category);
-        return ResponseEntity.ok().body("Category created successfully");
+
+        if (categoryRequest.getCategoryName().matches(".*\\d.*")){
+            ResponseEntity.status(403).body("Numbers are not allowed");
+        }
+
+        categoryRequest.setCategoryName(categoryRequest.getCategoryName().toLowerCase());
+        String categoryName = categoryRequest.getCategoryName().substring(0, 1).toUpperCase() + categoryRequest.getCategoryName().substring(1);
+        categoryRequest.setCategoryName(categoryName);
+
+        Category existCategory = categoryService.findCategoryByUserIdAndCategoryName(user.getId(), categoryRequest.getCategoryName());
+        if (existCategory == null){
+            Category category = Category.builder()
+                    .categoryName(categoryRequest.getCategoryName())
+                    .type(CategoryType.valueOf(categoryRequest.getType()))
+                    .user(user)
+                    .build();
+            categoryService.save(category);
+            return ResponseEntity.ok().body("Category created successfully");
+        }
+
+        return ResponseEntity.status(403).body("You already have this category");
     }
 }
