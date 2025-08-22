@@ -41,6 +41,7 @@ public class CategoryController {
     ) {
         UserResponse userResponse = authenticationService.fetchAPI(jwt, httpRequest.getHeader("User-Agent"));
         List<Category> categories = categoryService.findAllByUserId(userResponse.getId());
+        System.out.println(categories);
 
         if (categories.isEmpty()) {
             return ResponseEntity.noContent().build();

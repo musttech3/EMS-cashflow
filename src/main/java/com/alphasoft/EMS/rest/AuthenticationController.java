@@ -31,14 +31,13 @@ public class AuthenticationController {
     ) {
         String token = service.register(request, httpRequest.getHeader("User-Agent"));
 
-        // 2. إنشاء الكوكي الآمن
         ResponseCookie cookie = ResponseCookie.from("CashFlow-EMS-JWT", token)
-                .httpOnly(true)  // HTTP-Only لمنع الوصول عبر JavaScript
-                .secure(true)    // يُرسل فقط على HTTPS (في الإنتاج)
-                .path("/")       // متاح لجميع المسارات
-//                .domain("")
-                .maxAge(jwtService.expiration / 1000) // الصلاحية: 24 ساعة (بالثواني)
-                .sameSite("Strict") // الحماية من هجمات CSRF
+                .httpOnly(true)
+                .secure(false)    // ← false للمحلي (HTTP)
+                .path("/")
+                .domain("localhost")     // ← null للمحلي
+                .maxAge(jwtService.expiration / 1000)
+                .sameSite("Lax")  // ← Lax للمحلي
                 .build();
 
         // 3. إضافة الكوكي إلى الرد
@@ -61,14 +60,13 @@ public class AuthenticationController {
     ) {
         String token = service.login(request, httpRequest.getHeader("User-Agent"));
 
-        // 2. إنشاء الكوكي الآمن
         ResponseCookie cookie = ResponseCookie.from("CashFlow-EMS-JWT", token)
-                .httpOnly(true)  // HTTP-Only لمنع الوصول عبر JavaScript
-                .secure(true)    // يُرسل فقط على HTTPS (في الإنتاج)
-                .path("/")       // متاح لجميع المسارات
-//                .domain("")
-                .maxAge(jwtService.expiration / 1000) // الصلاحية: 24 ساعة (بالثواني)
-                .sameSite("Strict") // الحماية من هجمات CSRF
+                .httpOnly(true)
+                .secure(false)    // ← false للمحلي (HTTP)
+                .path("/")
+                .domain("localhost")     // ← null للمحلي
+                .maxAge(jwtService.expiration / 1000)
+                .sameSite("Lax")  // ← Lax للمحلي
                 .build();
 
         // 3. إضافة الكوكي إلى الرد
@@ -85,15 +83,19 @@ public class AuthenticationController {
     @PostMapping("/logout") // Test success
     public ResponseEntity<?> logout(
             HttpServletResponse httpResponse,
+            HttpServletRequest httpRequest,
             @CookieValue(value = "CashFlow-EMS-JWT") String jwt
     ) {
         String jti = jwtService.extractJti(jwt);
         String username = jwtService.extractUsername(jwt);
         service.logout(jti, username);
 
+        String origin = httpRequest.getHeader("Origin");
+        boolean isHttps = origin != null && origin.startsWith("https");
+
         ResponseCookie cookie = ResponseCookie.from("CashFlow-EMS-JWT", "")
                 .maxAge(0)
-                .httpOnly(true)  // نفس إعدادات الكوكي الأصلي
+                .httpOnly(isHttps)  // نفس إعدادات الكوكي الأصلي
                 .secure(true)    // إذا كنت تستخدم HTTPS
                 .path("/")       // نفس المسار الذي أنشأت به الكوكي
                 .sameSite("Strict")
@@ -110,15 +112,19 @@ public class AuthenticationController {
     @PostMapping("/logout-all") // Test success
     public ResponseEntity<?> logoutAll(
             HttpServletResponse response,
+            HttpServletRequest httpRequest,
             @CookieValue(value = "CashFlow-EMS-JWT") String jwt
     ) {
         String username = jwtService.extractUsername(jwt);
         service.logoutAll(username);
 
+        String origin = httpRequest.getHeader("Origin");
+        boolean isHttps = origin != null && origin.startsWith("https");
+
         ResponseCookie cookie = ResponseCookie.from("CashFlow-EMS-JWT", "")
                 .maxAge(0)
                 .httpOnly(true)  // نفس إعدادات الكوكي الأصلي
-                .secure(true)    // إذا كنت تستخدم HTTPS
+                .secure(isHttps)    // إذا كنت تستخدم HTTPS
                 .path("/")       // نفس المسار الذي أنشأت به الكوكي
                 .sameSite("Strict")
                 .build();

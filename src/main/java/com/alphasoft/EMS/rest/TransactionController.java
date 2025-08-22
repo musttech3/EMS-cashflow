@@ -80,6 +80,7 @@ public class TransactionController {
     @GetMapping("/transactions/category/{category}")
     public ResponseEntity<List<Transaction>> getAllTransactionsByCategory(
             @PathVariable String category,
+            // this just for testing
             @CookieValue(value = "CashFlow-EMS-JWT") String jwt,
             HttpServletRequest httpRequest
     ){
@@ -112,6 +113,9 @@ public class TransactionController {
             @CookieValue(value = "CashFlow-EMS-JWT") String jwt,
             HttpServletRequest httpRequest
     ){
+
+        System.out.println("Hello world");
+
         DateTimeFormatter formatter;
         UserResponse userResponse = authenticationService.fetchAPI(jwt, httpRequest.getHeader("User-Agent"));
         if (date.equals("today")){

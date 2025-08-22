@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -54,7 +55,7 @@ public class FamilyController {
             throw new UserNotEnabledException("You`re not enabled to use CashFlow");
         }
 
-        String familyCode = new BCryptPasswordEncoder().encode(LocalDateTime.now().toString() + userResponse.getUsername() + creationRequest.getFamilyName()).substring(7,36);
+        String familyCode = String.valueOf(Math.random() * 9999999) + userResponse.getUsername();
         System.out.println(familyCode);
         Family newFamily = Family.builder()
                 .familyName(creationRequest.getFamilyName())

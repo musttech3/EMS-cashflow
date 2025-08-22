@@ -61,11 +61,15 @@ public class SecurityConfiguration {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOriginPatterns("*") // أو تحديد نطاقات محددة
+                        .allowedOriginPatterns(
+                                "http://50.19.171.129:3000",
+                                "http://localhost:8080",
+                                "http://localhost:3000"
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .exposedHeaders("Authorization")
-                        .allowCredentials(false)
+                        .exposedHeaders("Authorization", "Set-Cookie") // ← إضافة Set-Cookie هنا
+                        .allowCredentials(true)
                         .maxAge(3600);
             }
         };
